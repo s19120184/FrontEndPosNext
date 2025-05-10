@@ -1,20 +1,38 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware"; //para poder ver el contenido del state en Redux del navegador
-import { Product, ShoppingCart } from "./schemas";
+import { Coupon, Product, ResponseSchemaCoupon, ShoppingCart } from "./schemas";
+import { redirect } from "next/navigation";
+
+
 
 interface Store {
   total: number; //total a pagar
+  discount:number;
   contents: ShoppingCart;
+  coupon:Coupon; //state para el cupon
   addToCart: (product: Product) => void;
   updateQuantity:(id:Product['id'], quantity:number)=>void
   removeFromCart:(id:Product['id'])=>void
   calculateTotal:()=>void
+  applyCoupon:(couponName:string)=>Promise<void>
+  applyDiscount:()=> void
+  clearOrder:()=>void
+}
+
+const initialState={
+    total: 0,
+    discount:0,
+    contents: [], //carrito vacio
+    coupon:{
+       percentage:0,
+       name:'',
+       message:''
+    },
 }
 
 export const useStore = create<Store>()(
   devtools((set, get) => ({
-    total: 0,
-    contents: [], //carrito vacio
+     ...initialState,
     addToCart: (product) => {
       const { id: productId, ...data } = product;
       let contents: ShoppingCart = [];
@@ -70,16 +88,71 @@ export const useStore = create<Store>()(
     //* eliminar del carrito
     removeFromCart:(id)=>{
         set((state)=>({
-            contents: state.contents.filter(item => item.productId !== id)
+            contents: state.contents.filter(item => item.productId !== id),
         }))
+
+        if(!get().contents.length){
+            get().clearOrder()
+        }
         //calculamos el total
         get().calculateTotal()
+        
     },
     //* calcular el total
     calculateTotal:() =>{
         const total = get().contents.reduce((total, item)=>total +(item.quantity* item.price),0 )
         set(()=>({
             total
+        }))
+
+        if(get().coupon.percentage){
+           get().applyDiscount()
+        }
+    },
+    // *aplicar cupones
+    applyCoupon:async(couponName)=>{
+        console.log(couponName)
+        const req = await fetch('/coupons/api',{
+           method:'POST',
+           body:JSON.stringify({
+              coupon_name: couponName
+           })
+        })
+
+        const json = await req.json()
+        const coupon = ResponseSchemaCoupon.parse(json)
+
+        if(!req.ok){
+           console.log('Error consulta a la api')
+           redirect('/1')
+        }
+
+        //guardamos en el state los datos del cupon
+        set(()=>({
+           coupon
+        }))
+       
+        if(coupon.percentage){
+          get().applyDiscount()
+        }
+        
+         
+    },
+    // *aplicar el descuento del cupon
+    applyDiscount:()=>{
+         const subTotal = get().contents.reduce((total, item)=> total +(item.quantity * item.price),0)
+         const discount= (get().coupon.percentage /100) * subTotal
+         const total = subTotal -discount
+
+         set(()=>({
+             discount,
+             total
+         }))
+    },
+    //* limpiar la order
+    clearOrder:()=>{
+        set(()=>({
+          ...initialState
         }))
     }
   }))

@@ -39,6 +39,15 @@ export const ShoppingCartSchema = z.array(ShoppingCartContentsSchema)//agregado
 
 
 
+export const ResponseSchemaCoupon = z.object({
+    name:z.string().default(''),
+    message:z.string(),
+    percentage:z.coerce.number().min(0).max(100).default(0)
+
+})
+
+
 export type Product = z.infer<typeof ProductSchema>
 export type ShoppingCart = z.infer<typeof ShoppingCartSchema>//agregado
 export type CartItem = z.infer <typeof ShoppingCartContentsSchema>//agregado
+export type Coupon = z.infer<typeof ResponseSchemaCoupon>
