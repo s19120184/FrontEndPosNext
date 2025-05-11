@@ -3,6 +3,7 @@ import { useStore } from "@/src/store";
 import ShoppingCartItem from "./ShoppingCartItem";
 import Amaout from "./Amaout";
 import CuponForm from "./CuponForm";
+import SubmitOrderForm from "./SubmitOrderForm";
 
 export default function ShoppingCart() {
   const contents = useStore((state) => state.contents);
@@ -30,6 +31,7 @@ export default function ShoppingCart() {
            
           </dl>
           <CuponForm/>
+          <SubmitOrderForm/>
         </>
       ) : (
         <p className="text-center font-bold text-2xl">Carrito esta vacio</p>

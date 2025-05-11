@@ -11,7 +11,11 @@ type Params = Promise<{ categoryId: string }>;
 async function getProducts(categoryId: string) {
   const url = `${process.env.API_URL}/categories/${categoryId}?products=true`;
 
-  const req = await fetch(url);
+  const req = await fetch(url, {
+    next:{  //podemos darle un identificador a la consulta
+      tags:['products-by-category']
+    }
+  });
   const json = await req.json();
   if(!req.ok){
     redirect('/1')
