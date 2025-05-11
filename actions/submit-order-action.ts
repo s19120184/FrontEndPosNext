@@ -6,8 +6,7 @@ import { revalidateTag } from "next/cache"
 export async function submitOrder(data:unknown) {
     
     const order = OrderSchema.parse(data)
-    console.log(order)
-    
+  
     const url=`${process.env.API_URL}/transactions`
 
     const req = await fetch(url,{
