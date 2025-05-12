@@ -11,6 +11,15 @@ export const ProductSchema = z.object({
     //categoryId: z.number()
 })
 
+
+
+//esquema para la validacin de el response al obtener los productos
+export const ProductsResponseSchema= z.object({
+  produts:z.array(ProductSchema),
+  total:z.number()
+})
+
+
 export const CategorySchema = z.object({
     id: z.number(),
     name: z.string()
