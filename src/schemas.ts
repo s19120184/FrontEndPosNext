@@ -20,9 +20,23 @@ export const ProductsResponseSchema= z.object({
 })
 
 
+
+
 export const CategorySchema = z.object({
     id: z.number(),
     name: z.string()
+})
+
+//esquema para validar la respuesta del producto al editar
+export const ProductResponseSchema = ProductSchema.pick({
+    id:true,
+    name:true,
+    image:true,
+    price:true,
+    inventory:true
+ 
+}).extend({
+     category:CategorySchema
 })
 
 export const CategoriesResponseSchema = z.array(CategorySchema)
@@ -96,8 +110,21 @@ export const ContentsSchema = z.object({
 // ****************
 
 
+// ** esquema para la validacion del formulario en agregar producto
+export const ProductFormSchema = z.object({
+  name: z.string()
+          .min(1, {message: 'El Nombre del Producto no puede ir vacio'}),
+  price: z.coerce.number({message: 'Precio no válido'})
+          .min(1, {message: 'El Precio debe ser mayor a 0'}),
+  inventory: z.coerce.number({message: 'Inventario no válido'})
+          .min(1, {message: 'El inventario debe ser mayor a 0'}),
+  categoryId: z.coerce.number({message: 'La Categoria no es válida'})
+})
+
+
 export type Product = z.infer<typeof ProductSchema>
 export type ShoppingCart = z.infer<typeof ShoppingCartSchema>//agregado
 export type CartItem = z.infer <typeof ShoppingCartContentsSchema>//agregado
 export type Coupon = z.infer<typeof ResponseSchemaCoupon>
 export type Transaction=  z.infer<typeof TransactionResponseSchema> 
+export type ProductEdit= z.infer<typeof ProductResponseSchema>
