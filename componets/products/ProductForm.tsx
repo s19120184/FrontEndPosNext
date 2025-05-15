@@ -1,4 +1,5 @@
 import { CategoriesResponseSchema, ProductEdit } from "@/src/schemas"
+import UploadProductImage from "./UploadProductImage"
 
 
 async function getCategories() {
@@ -89,7 +90,11 @@ export default async function ProductForm({product}:{product?:ProductEdit}) {
               <option key={category.id} value={category.id}>{category.name}</option>
            ))}
         </select>
+        
       </div>
+      <UploadProductImage
+          currentImage= { product?.image}
+      />
 
     </>
   )

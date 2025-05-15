@@ -14,6 +14,7 @@ async function getProduct(id: string) {
 
     if(!req.ok){
         notFound()
+        
     }
 
     const product = ProductResponseSchema.parse(json);
